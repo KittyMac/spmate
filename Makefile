@@ -1,8 +1,4 @@
 
-VERSION := $(shell git describe --abbrev=0)
-VERSION2 := $(subst v,,$(VERSION))
-DERIVED_DATA := $(shell xcodebuild -showBuildSettings | grep -m 1 BUILD_DIR | grep -oE "\/.*" | sed 's|/Build/Products||')
-
 build-release:
 	# Building the XCFramework
 	rm -rf ./build

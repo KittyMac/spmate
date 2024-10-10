@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		46D8D51A2CB847540081B1C2 /* spmate.h in Headers */ = {isa = PBXBuildFile; fileRef = 46D8D5192CB847540081B1C2 /* spmate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		46BF451A2CB849CA008CD18F /* spmate.h in Headers */ = {isa = PBXBuildFile; fileRef = 46BF45192CB849CA008CD18F /* spmate.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		46BF45192CB849CA008CD18F /* spmate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = spmate.h; path = Sources/spmate.h; sourceTree = "<group>"; };
 		46D8D5162CB847540081B1C2 /* spmate.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = spmate.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		46D8D5192CB847540081B1C2 /* spmate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = spmate.h; sourceTree = "<group>"; };
 		46D8D5212CB847930081B1C2 /* spmate */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = spmate; path = ..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -30,8 +30,8 @@
 		46D8D50C2CB847540081B1C2 = {
 			isa = PBXGroup;
 			children = (
+				46BF45192CB849CA008CD18F /* spmate.h */,
 				46D8D5202CB847930081B1C2 /* Packages */,
-				46D8D5182CB847540081B1C2 /* spmate */,
 				46D8D5172CB847540081B1C2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -42,14 +42,6 @@
 				46D8D5162CB847540081B1C2 /* spmate.framework */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		46D8D5182CB847540081B1C2 /* spmate */ = {
-			isa = PBXGroup;
-			children = (
-				46D8D5192CB847540081B1C2 /* spmate.h */,
-			);
-			path = spmate;
 			sourceTree = "<group>";
 		};
 		46D8D5202CB847930081B1C2 /* Packages */ = {
@@ -67,7 +59,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				46D8D51A2CB847540081B1C2 /* spmate.h in Headers */,
+				46BF451A2CB849CA008CD18F /* spmate.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
