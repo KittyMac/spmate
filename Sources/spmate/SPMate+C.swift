@@ -12,6 +12,11 @@ public typealias CallbackPtr = @convention(c) (VoidPtr?, UTF8Ptr?) -> ()
 var spmRefereces: [String: SPMate] = [:]
 let lock = NSLock()
 
+@_cdecl("spmate_test")
+public func spmate_test() {
+    print("test")
+}
+
 @_cdecl("spmate_new")
 public func spmate_new(path: String) -> String {
     lock.lock(); defer { lock.unlock() }
