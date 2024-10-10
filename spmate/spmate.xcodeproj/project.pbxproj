@@ -7,98 +7,119 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		46BF451A2CB849CA008CD18F /* spmate.h in Headers */ = {isa = PBXBuildFile; fileRef = 46BF45192CB849CA008CD18F /* spmate.h */; };
+		4604C2582CB84FDF0083212D /* spmate.h in Headers */ = {isa = PBXBuildFile; fileRef = 4604C2572CB84FDF0083212D /* spmate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4604C2622CB850170083212D /* SPMate in Frameworks */ = {isa = PBXBuildFile; productRef = 4604C2612CB850170083212D /* SPMate */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		46BF45192CB849CA008CD18F /* spmate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = spmate.h; path = Sources/spmate.h; sourceTree = "<group>"; };
-		46D8D5162CB847540081B1C2 /* spmate.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = spmate.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		46D8D5212CB847930081B1C2 /* spmate */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = spmate; path = ..; sourceTree = "<group>"; };
+		4604C2542CB84FDF0083212D /* spmate.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = spmate.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4604C2572CB84FDF0083212D /* spmate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = spmate.h; sourceTree = "<group>"; };
+		4604C25F2CB850070083212D /* spmate */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = spmate; path = ..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		46D8D5132CB847540081B1C2 /* Frameworks */ = {
+		4604C2512CB84FDF0083212D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4604C2622CB850170083212D /* SPMate in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		46D8D50C2CB847540081B1C2 = {
+		4604C24A2CB84FDF0083212D = {
 			isa = PBXGroup;
 			children = (
-				46BF45192CB849CA008CD18F /* spmate.h */,
-				46D8D5202CB847930081B1C2 /* Packages */,
-				46D8D5172CB847540081B1C2 /* Products */,
+				4604C25E2CB850070083212D /* Packages */,
+				4604C2562CB84FDF0083212D /* spmate */,
+				4604C2552CB84FDF0083212D /* Products */,
+				4604C2602CB850170083212D /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
-		46D8D5172CB847540081B1C2 /* Products */ = {
+		4604C2552CB84FDF0083212D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				46D8D5162CB847540081B1C2 /* spmate.framework */,
+				4604C2542CB84FDF0083212D /* spmate.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		46D8D5202CB847930081B1C2 /* Packages */ = {
+		4604C2562CB84FDF0083212D /* spmate */ = {
 			isa = PBXGroup;
 			children = (
-				46D8D5212CB847930081B1C2 /* spmate */,
+				4604C2572CB84FDF0083212D /* spmate.h */,
+			);
+			path = spmate;
+			sourceTree = "<group>";
+		};
+		4604C25E2CB850070083212D /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				4604C25F2CB850070083212D /* spmate */,
 			);
 			name = Packages;
+			sourceTree = "<group>";
+		};
+		4604C2602CB850170083212D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		46D8D5112CB847540081B1C2 /* Headers */ = {
+		4604C24F2CB84FDF0083212D /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				46BF451A2CB849CA008CD18F /* spmate.h in Headers */,
+				4604C2582CB84FDF0083212D /* spmate.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		46D8D5152CB847540081B1C2 /* spmate */ = {
+		4604C2532CB84FDF0083212D /* spmate */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 46D8D51D2CB847540081B1C2 /* Build configuration list for PBXNativeTarget "spmate" */;
+			buildConfigurationList = 4604C25B2CB84FDF0083212D /* Build configuration list for PBXNativeTarget "spmate" */;
 			buildPhases = (
-				46D8D5112CB847540081B1C2 /* Headers */,
-				46D8D5122CB847540081B1C2 /* Sources */,
-				46D8D5132CB847540081B1C2 /* Frameworks */,
-				46D8D5142CB847540081B1C2 /* Resources */,
+				4604C24F2CB84FDF0083212D /* Headers */,
+				4604C2502CB84FDF0083212D /* Sources */,
+				4604C2512CB84FDF0083212D /* Frameworks */,
+				4604C2522CB84FDF0083212D /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = spmate;
+			packageProductDependencies = (
+				4604C2612CB850170083212D /* SPMate */,
+			);
 			productName = spmate;
-			productReference = 46D8D5162CB847540081B1C2 /* spmate.framework */;
+			productReference = 4604C2542CB84FDF0083212D /* spmate.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		46D8D50D2CB847540081B1C2 /* Project object */ = {
+		4604C24B2CB84FDF0083212D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastUpgradeCheck = 1420;
 				TargetAttributes = {
-					46D8D5152CB847540081B1C2 = {
+					4604C2532CB84FDF0083212D = {
 						CreatedOnToolsVersion = 14.2;
 					};
 				};
 			};
-			buildConfigurationList = 46D8D5102CB847540081B1C2 /* Build configuration list for PBXProject "spmate" */;
+			buildConfigurationList = 4604C24E2CB84FDF0083212D /* Build configuration list for PBXProject "spmate" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -106,18 +127,18 @@
 				en,
 				Base,
 			);
-			mainGroup = 46D8D50C2CB847540081B1C2;
-			productRefGroup = 46D8D5172CB847540081B1C2 /* Products */;
+			mainGroup = 4604C24A2CB84FDF0083212D;
+			productRefGroup = 4604C2552CB84FDF0083212D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				46D8D5152CB847540081B1C2 /* spmate */,
+				4604C2532CB84FDF0083212D /* spmate */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		46D8D5142CB847540081B1C2 /* Resources */ = {
+		4604C2522CB84FDF0083212D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -127,7 +148,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		46D8D5122CB847540081B1C2 /* Sources */ = {
+		4604C2502CB84FDF0083212D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -137,7 +158,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		46D8D51B2CB847540081B1C2 /* Debug */ = {
+		4604C2592CB84FDF0083212D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -200,7 +221,7 @@
 			};
 			name = Debug;
 		};
-		46D8D51C2CB847540081B1C2 /* Release */ = {
+		4604C25A2CB84FDF0083212D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -256,7 +277,7 @@
 			};
 			name = Release;
 		};
-		46D8D51E2CB847540081B1C2 /* Debug */ = {
+		4604C25C2CB84FDF0083212D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -284,7 +305,7 @@
 			};
 			name = Debug;
 		};
-		46D8D51F2CB847540081B1C2 /* Release */ = {
+		4604C25D2CB84FDF0083212D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -315,25 +336,32 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		46D8D5102CB847540081B1C2 /* Build configuration list for PBXProject "spmate" */ = {
+		4604C24E2CB84FDF0083212D /* Build configuration list for PBXProject "spmate" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				46D8D51B2CB847540081B1C2 /* Debug */,
-				46D8D51C2CB847540081B1C2 /* Release */,
+				4604C2592CB84FDF0083212D /* Debug */,
+				4604C25A2CB84FDF0083212D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		46D8D51D2CB847540081B1C2 /* Build configuration list for PBXNativeTarget "spmate" */ = {
+		4604C25B2CB84FDF0083212D /* Build configuration list for PBXNativeTarget "spmate" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				46D8D51E2CB847540081B1C2 /* Debug */,
-				46D8D51F2CB847540081B1C2 /* Release */,
+				4604C25C2CB84FDF0083212D /* Debug */,
+				4604C25D2CB84FDF0083212D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4604C2612CB850170083212D /* SPMate */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SPMate;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
-	rootObject = 46D8D50D2CB847540081B1C2 /* Project object */;
+	rootObject = 4604C24B2CB84FDF0083212D /* Project object */;
 }
