@@ -5,14 +5,14 @@ import Foundation
 public class TestFunction: Codable {
     public var functionName: String
     public var filePath: String?
-    public var fileLine: Int64?
+    public var fileOffset: Int64?
     
     init(functionName: String,
          filePath: String?,
-         fileLine: Int64?) {
+         fileOffset: Int64?) {
         self.functionName = functionName
         self.filePath = filePath
-        self.fileLine = fileLine
+        self.fileOffset = fileOffset
     }
 }
 
@@ -50,7 +50,7 @@ extension SwiftProject {
                             testClass.tests.append(
                                 TestFunction(functionName: functionName,
                                              filePath: classSyntax.file.path,
-                                             fileLine: function.bodyoffset)
+                                             fileOffset: function.bodyoffset)
                             )
                         }
                     }
