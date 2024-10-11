@@ -8,6 +8,7 @@ let package = Package(
         .library(name: "SPMate", targets: ["SPMate"]),
     ],
     dependencies: [
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
         .package(url: "https://github.com/jpsim/SourceKitten", exact: "0.32.0"),
         .package(url: "https://github.com/KittyMac/Hitch.git", from: "0.4.0"),
         .package(url: "https://github.com/KittyMac/Spanker.git", from: "0.2.0"),
@@ -15,8 +16,15 @@ let package = Package(
         .package(url: "https://github.com/KittyMac/Flynn.git", from: "0.4.0")
     ],
     targets: [
-        .target(
+        .executableTarget(
             name: "SPMate",
+            dependencies: [
+                "SPMateFramework",
+                .product(name: "ArgumentParser", package: "swift-argument-parser")
+            ]
+        ),
+        .target(
+            name: "SPMateFramework",
             dependencies: [
                 "Hitch",
                 "Spanker",

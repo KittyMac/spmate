@@ -1,5 +1,5 @@
 import XCTest
-import SPMate
+import SPMateFramework
 import Hitch
 import Flynn
 
