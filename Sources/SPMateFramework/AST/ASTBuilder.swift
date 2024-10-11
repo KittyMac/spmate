@@ -1,5 +1,6 @@
 import Foundation
 import SourceKittenFramework
+import Flynn
 
 typealias ASTBuilderResult = ((AST) -> Void)
 
@@ -39,6 +40,8 @@ class ASTBuilder: Sequence {
     }
     
     func add(directory: String) {
+        var allFilePaths: [String] = []
+        
         if let enumerator = FileManager.default.enumerator(at: URL(fileURLWithPath: directory),
                                                            includingPropertiesForKeys: [.isRegularFileKey],
                                                            options: [.skipsHiddenFiles, .skipsPackageDescendants]) {
@@ -46,21 +49,26 @@ class ASTBuilder: Sequence {
                 do {
                     let fileAttributes = try fileURL.resourceValues(forKeys:[.isRegularFileKey])
                     if fileAttributes.isRegularFile == true && fileURL.pathExtension == "swift" {
-                        
-                        if let file = File(path: fileURL.path),
-                           let syntax = try? StructureAndSyntax(file: file) {
-                            
-                            let fileSyntax = FileSyntax(outputPath: "/tmp",
-                                                        file: file,
-                                                        structure: syntax.structure,
-                                                        ancestry: [],
-                                                        tokens: syntax.syntax,
-                                                        blacklist: [],
-                                                        dependency: false)
-                            add(fileSyntax)
-                        }
+                        allFilePaths.append(fileURL.path)
                     }
                 } catch { print(error, fileURL) }
+            }
+        }
+        
+        allFilePaths.syncOOB(count: Flynn.cores, timeout: 60) { filePath, synchronized in
+            if let file = File(path: filePath),
+               let syntax = try? StructureAndSyntax(file: file) {
+                
+                let fileSyntax = FileSyntax(outputPath: "/tmp",
+                                            file: file,
+                                            structure: syntax.structure,
+                                            ancestry: [],
+                                            tokens: syntax.syntax,
+                                            blacklist: [],
+                                            dependency: false)
+                synchronized {
+                    self.add(fileSyntax)
+                }
             }
         }
     }
