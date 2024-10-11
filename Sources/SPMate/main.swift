@@ -33,7 +33,8 @@ extension SPMate {
         mutating func run() throws {
             let project = SwiftProject(path: options.path ?? FileManager.default.currentDirectoryPath)
             project.beTestsList(Flynn.any) { tests in
-                print(tests)
+                let json = try! tests.json(pretty: false)
+                print(json)
             }
             Flynn.shutdown()
         }

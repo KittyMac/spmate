@@ -7,10 +7,5 @@ public class SwiftProject: Actor {
     public init(path: String) {
         self.safePath = path
         super.init()
-        self.beRefreshAll()
-    }
-    
-    internal func _beRefreshAll() {
-        safeRefreshTests();
     }
 }
