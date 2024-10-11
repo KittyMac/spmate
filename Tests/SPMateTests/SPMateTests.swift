@@ -11,8 +11,8 @@ final class SPMateTests: XCTestCase {
     
     func testTestsList() throws {
         let expectation = XCTestExpectation(description: #function)
-        let spmate = SPMate(path: projectPath())
-        spmate.beTestsList(Flynn.any) { tests in
+        let project = SwiftProject(path: projectPath())
+        project.beTestsList(Flynn.any) { tests in
             print(tests)
             expectation.fulfill()
         }

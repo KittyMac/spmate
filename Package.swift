@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "SPMate",
     products: [
-        .library(name: "SPMate", targets: ["SPMate"]),
+        .executable(name: "SPMate", targets: ["SPMate"])
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
