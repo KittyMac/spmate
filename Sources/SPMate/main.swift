@@ -47,12 +47,12 @@ extension SPMate {
         
         @OptionGroup var options: Options
         
-        @Option(help: "Run test cases matching regular expression")
+        @Option(help: "Comma-separated list of regex filters")
         var filter: String?
         
         mutating func run() throws {
             let project = SwiftProject(path: options.path ?? FileManager.default.currentDirectoryPath)
-            project.beTestsRun(filter: filter,
+            project.beTestsRun(filters: filter?.components(separatedBy: ","),
                                Flynn.any) { tests in
                 let json = try! tests.json(pretty: false)
                 print(json)

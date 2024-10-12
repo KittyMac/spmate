@@ -80,63 +80,106 @@ extension SwiftProject {
         returnCallback(allTestClasses)
     }
     
-    internal func _beTestsRun(filter: String?,
+    internal func _beTestsRun(filters: [String]?,
                               _ returnCallback: @escaping ([TestResult]) -> ()) {
-        let path = pathFor(executable: "swift")
         
-        let outputPath = "/tmp/\(UUID().uuidString).xunit"
-                
+        // options for improving speed:
+        // prebuild: swift build --build-tests
+        //
+        // Use multiple processes ourselve (don't use --parallel); perhaps one
+        // process for each testing class?
+        // swift test --skip-build --filter test_a
+        
+        // NOT IDEAL
+        // call xctest directly like this
+        // /Applications/Xcode-15.2.0.app/Contents/Developer/usr/bin/xctest -XCTest EMLTests_AC.ReceiptsTests_cabelas0/test_cabelas00 /Users/rjbowli/Development/smallplanet/smallplanet_RoverJS_SDK/eml_tests/.build/arm64-apple-macosx/debug/MerchantPackageTests.xctest
+        // /Applications/Xcode-15.2.0.app/Contents/Developer/usr/bin/xctest -XCTest --dump-tests-json /Users/rjbowli/Development/smallplanet/smallplanet_RoverJS_SDK/eml_tests/.build/arm64-apple-macosx/debug/MerchantPackageTests.xctest
+        
+        let path = pathFor(executable: "swift")
+        let projectPath = safePath
+        
+        
+        // 0. ensure the swift project is built for testing
+        let startBuilds = Date()
         var arguments: [String] = []
-        arguments.append("test")
+        arguments.append("build")
         arguments.append("--package-path")
         arguments.append(safePath)
-        arguments.append("--parallel")
-        arguments.append("--xunit-output")
-        arguments.append(outputPath)
-        if let filter = filter {
-            arguments.append("--filter")
-            arguments.append(filter)
-        }
-                        
+        arguments.append("--build-tests")
         let task = Spawn(path: path,
                          arguments: arguments)
-        
         task.nullStandardOutput()
         task.nullStandardError()
-                
         task.run()
-        
         task.wait()
+        print("Build done in \(abs(startBuilds.timeIntervalSinceNow))s")
         
+        // 1. then run all of the filters in parallel
+        let allFilters = filters ?? [""]
         var allResults: [TestResult] = []
+        let startTests = Date()
         
-        if let results = Hitch(contentsOfFile: outputPath) {
-            Studding.parsed(hitch: results) { root in
-                guard let root = root else { return }
-                guard let testcases = root["testsuite"]?.children else { return }
-                
-                for testcase in testcases {
-                    guard let combinedName: HalfHitch = testcase.attr(name: "classname") else { continue }
-                    guard let functionName: HalfHitch = testcase.attr(name: "name") else { continue }
-                    // guard let time: HalfHitch = testcase.attr(name: "time") else { continue }
-                    let result: String = testcase["failure"] == nil ? "success" : "failure"
+        allFilters.syncOOB(timeout: 30 * 60) { filter, synchronized in
                     
-                    let combinedNameParts: [Hitch] = combinedName.components(separatedBy: ".")
-                    let targetName = combinedNameParts[0]
-                    let className = combinedNameParts[1]
-                    
-                    allResults.append(
-                        TestResult(targetName: targetName.toString(),
-                                   className: className.toString(),
-                                   functionName: functionName.toString(),
-                                   result: result)
-                    )
-                }
-                
+            var arguments: [String] = []
+            arguments.append("test")
+            arguments.append("--skip-build")
+            arguments.append("--package-path")
+            arguments.append(projectPath)
+            if filter.isEmpty == false {
+                arguments.append("--filter")
+                arguments.append(filter)
             }
+            let outPipe = SafePipe()!
+            let task = Spawn(path: path,
+                             arguments: arguments)
+            task.setStandardOutput(outPipe)
+            task.nullStandardError()
+            
+            task.terminationHandler = { _, _ in
+                outPipe.fileHandleForWriting.closeFile()
+            }
+
+            task.run()
+            
+            Thread {
+                while let result = outPipe.fileHandleForReading.read(upToCount: 1024 * 1024 * 32) {
+                    let hitch = Hitch(data: result)
+                    let lines: [HalfHitch] = hitch.components(separatedBy: "\n")
+                    for line in lines {
+                        // Test Case '-[testTests.ExampleTestsA testExample0]' passed (0.001 seconds).
+                        // Test Case '-[testTests.ExampleTestsB testExample1]' failed (0.000 seconds).
+                        let regex = #"\[([\w\d]+)\.([\w\d]+)\s([\w\d]+)]\'\s+(\w+)"#
+                        
+                        if line.starts(with: "Test Case ") {
+                            line.toTempString().matches(regex) { (_, groups) in
+                                guard groups.count == 5 else { return }
+                                
+                                let targetName = groups[1]
+                                let className = groups[2]
+                                let functionName = groups[3]
+                                let result = groups[4]
+                                
+                                if result == "passed" || result == "failed" {
+                                    synchronized {
+                                        allResults.append(
+                                            TestResult(targetName: targetName,
+                                                       className: className,
+                                                       functionName: functionName,
+                                                       result: result)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }.start()
+            
+            task.wait()
         }
         
-        try? FileManager.default.removeItem(atPath: outputPath)
+        print("All tests done in \(abs(startTests.timeIntervalSinceNow))s")
         
         returnCallback(allResults)
     }

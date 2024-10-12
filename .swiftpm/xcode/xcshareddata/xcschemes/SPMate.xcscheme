@@ -110,7 +110,7 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--filter test_"
+            argument = "--filter test_a,test_b,test_c"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
