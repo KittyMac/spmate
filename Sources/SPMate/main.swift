@@ -19,7 +19,7 @@ extension SPMate {
     struct Test: ParsableCommand {
         static let configuration = CommandConfiguration(
             abstract: "Interact with Swift testing",
-            subcommands: [List.self]
+            subcommands: [List.self, Run.self]
         )
     }
     
@@ -33,6 +33,27 @@ extension SPMate {
         mutating func run() throws {
             let project = SwiftProject(path: options.path ?? FileManager.default.currentDirectoryPath)
             project.beTestsList(Flynn.any) { tests in
+                let json = try! tests.json(pretty: false)
+                print(json)
+            }
+            Flynn.shutdown()
+        }
+    }
+    
+    struct Run: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Run "
+        )
+        
+        @OptionGroup var options: Options
+        
+        @Option(help: "Run test cases matching regular expression")
+        var filter: String?
+        
+        mutating func run() throws {
+            let project = SwiftProject(path: options.path ?? FileManager.default.currentDirectoryPath)
+            project.beTestsRun(filter: filter,
+                               Flynn.any) { tests in
                 let json = try! tests.json(pretty: false)
                 print(json)
             }
