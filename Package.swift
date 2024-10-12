@@ -12,6 +12,7 @@ let package = Package(
         .package(url: "https://github.com/jpsim/SourceKitten", exact: "0.32.0"),
         .package(url: "https://github.com/KittyMac/Hitch.git", from: "0.4.0"),
         .package(url: "https://github.com/KittyMac/Spanker.git", from: "0.2.0"),
+        .package(url: "https://github.com/KittyMac/Studding.git", from: "0.0.11"),
         .package(url: "https://github.com/KittyMac/Sextant.git", from: "0.4.0"),
         .package(url: "https://github.com/KittyMac/Flynn.git", from: "0.4.0")
     ],
@@ -27,6 +28,7 @@ let package = Package(
             name: "SPMateFramework",
             dependencies: [
                 "Hitch",
+                "Studding",
                 "Spanker",
                 "Sextant",
                 "Flynn",

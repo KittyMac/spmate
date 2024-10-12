@@ -2,6 +2,7 @@ import Flynn
 import SourceKittenFramework
 import Foundation
 import Hitch
+import Studding
 
 public class TestFunction: Codable {
     public var functionName: String
@@ -27,13 +28,16 @@ public class TestClass: Codable {
 }
 
 public class TestResult: Codable {
+    public var targetName: String
     public var className: String
     public var functionName: String
     public var result: String
     
-    init(className: String,
+    init(targetName: String,
+         className: String,
          functionName: String,
          result: String) {
+        self.targetName = targetName
         self.className = className
         self.functionName = functionName
         self.result = result
@@ -79,74 +83,61 @@ extension SwiftProject {
     internal func _beTestsRun(filter: String?,
                               _ returnCallback: @escaping ([TestResult]) -> ()) {
         let path = pathFor(executable: "swift")
+        
+        let outputPath = "/tmp/\(UUID().uuidString).xunit"
                 
         var arguments: [String] = []
         arguments.append("test")
         arguments.append("--package-path")
         arguments.append(safePath)
+        arguments.append("--parallel")
+        arguments.append("--xunit-output")
+        arguments.append(outputPath)
         if let filter = filter {
             arguments.append("--filter")
             arguments.append(filter)
         }
-        
-        let outPipe = SafePipe()!
-        let errPipe = SafePipe()!
-                
+                        
         let task = Spawn(path: path,
                          arguments: arguments)
         
-        task.setStandardOutput(outPipe)
-        task.setStandardError(errPipe)
-        
-        task.terminationHandler = { _, _ in
-            outPipe.fileHandleForWriting.closeFile()
-            errPipe.fileHandleForReading.closeFile()
-        }
-        
+        task.nullStandardOutput()
+        task.nullStandardError()
+                
         task.run()
         
-        let actor = Actor()
-        actor.unsafeSend { _ in
-            
-            var allResults: [TestResult] = []
-            
-            while true {
-                guard let result = outPipe.fileHandleForReading.read(upToCount: 1024 * 1024 * 32) else {
-                    break
-                }
+        task.wait()
+        
+        var allResults: [TestResult] = []
+        
+        if let results = Hitch(contentsOfFile: outputPath) {
+            Studding.parsed(hitch: results) { root in
+                guard let root = root else { return }
+                guard let testcases = root["testsuite"]?.children else { return }
                 
-                let hitch = Hitch(data: result)
-                let lines: [HalfHitch] = hitch.components(separatedBy: "\n")
-                for line in lines {
-                    // Test Case '-[testTests.ExampleTestsA testExample0]' passed (0.001 seconds).
-                    // Test Case '-[testTests.ExampleTestsB testExample1]' failed (0.000 seconds).
-                    let regex = #"\[[\w\d]+\.([\w\d]+)\s([\w\d]+)]\'\s+(\w+)"#
+                for testcase in testcases {
+                    guard let combinedName: HalfHitch = testcase.attr(name: "classname") else { continue }
+                    guard let functionName: HalfHitch = testcase.attr(name: "name") else { continue }
+                    // guard let time: HalfHitch = testcase.attr(name: "time") else { continue }
+                    let result: String = testcase["failure"] == nil ? "success" : "failure"
                     
-                    if line.starts(with: "Test Case ") {
-                        line.toTempString().matches(regex) { (_, groups) in
-                            guard groups.count == 4 else { return }
-                            
-                            let className = groups[1]
-                            let functionName = groups[2]
-                            let result = groups[3]
-                            
-                            if result == "passed" || result == "failed" {
-                                allResults.append(
-                                    TestResult(className: className,
-                                               functionName: functionName,
-                                               result: result)
-                                )
-                            }
-                        }
-                    }
+                    let combinedNameParts: [Hitch] = combinedName.components(separatedBy: ".")
+                    let targetName = combinedNameParts[0]
+                    let className = combinedNameParts[1]
+                    
+                    allResults.append(
+                        TestResult(targetName: targetName.toString(),
+                                   className: className.toString(),
+                                   functionName: functionName.toString(),
+                                   result: result)
+                    )
                 }
                 
-                //print(Hitch(data: result))
             }
-            
-            returnCallback(allResults)
         }
         
-        task.wait()
+        try? FileManager.default.removeItem(atPath: outputPath)
+        
+        returnCallback(allResults)
     }
 }

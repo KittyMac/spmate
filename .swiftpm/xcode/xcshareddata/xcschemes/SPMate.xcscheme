@@ -103,6 +103,14 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/rjbowli/Development/textmate/test"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/rjbowli/Development/smallplanet/smallplanet_RoverJS_SDK/eml_tests"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--filter test_"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

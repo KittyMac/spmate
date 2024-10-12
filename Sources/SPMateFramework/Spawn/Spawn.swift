@@ -38,6 +38,10 @@ public class Spawn {
         standardInputFd[0] = pipe.fileHandleForReading.fileDescriptor
         standardInputFd[1] = pipe.fileHandleForWriting.fileDescriptor
     }
+    func nullStandardInput() {
+        standardInputFd[0] = -99
+        standardInputFd[1] = -99
+    }
     
     func setStandardOutput(_ pipe: SafePipe) {
         standardOutputFd[0] = pipe.fileHandleForReading.fileDescriptor
@@ -47,6 +51,10 @@ public class Spawn {
         standardOutputFd[0] = pipe.fileHandleForReading.fileDescriptor
         standardOutputFd[1] = pipe.fileHandleForWriting.fileDescriptor
     }
+    func nullStandardOutput() {
+        standardOutputFd[0] = -99
+        standardOutputFd[1] = -99
+    }
 
     func setStandardError(_ pipe: SafePipe) {
         standardErrorFd[0] = pipe.fileHandleForReading.fileDescriptor
@@ -55,6 +63,10 @@ public class Spawn {
     func setStandardError(_ pipe: Pipe) {
         standardErrorFd[0] = pipe.fileHandleForReading.fileDescriptor
         standardErrorFd[1] = pipe.fileHandleForWriting.fileDescriptor
+    }
+    func nullStandardError() {
+        standardErrorFd[0] = -99
+        standardErrorFd[1] = -99
     }
     
     
@@ -127,23 +139,29 @@ public class Spawn {
         #endif
 
         posix_spawn_file_actions_init(&fa)
-                
+        
         // setup stdin redirection
-        if standardInputFd[0] != -1 && standardInputFd[1] != -1 {
+        if standardInputFd[0] == -99 && standardInputFd[1] == -99 {
+            posix_spawn_file_actions_addclose(&fa, 0)
+        } else if standardInputFd[0] != -1 && standardInputFd[1] != -1 {
             posix_spawn_file_actions_addclose(&fa, standardInputFd[1])
             posix_spawn_file_actions_adddup2(&fa, standardInputFd[0], 0)
             posix_spawn_file_actions_addclose(&fa, standardInputFd[0])
         }
 
         // setup stdout redirection
-        if standardOutputFd[0] != -1 && standardOutputFd[1] != -1 {
+        if standardOutputFd[0] == -99 && standardOutputFd[1] == -99 {
+            posix_spawn_file_actions_addclose(&fa, 1)
+        } else if standardOutputFd[0] != -1 && standardOutputFd[1] != -1 {
             posix_spawn_file_actions_addclose(&fa, standardOutputFd[0])
             posix_spawn_file_actions_adddup2(&fa, standardOutputFd[1], 1)
             posix_spawn_file_actions_addclose(&fa, standardOutputFd[1])
         }
 
         // setup stderr redirection
-        if standardErrorFd[0] != -1 && standardErrorFd[1] != -1 {
+        if standardErrorFd[0] == -99 && standardErrorFd[1] == -99 {
+            posix_spawn_file_actions_addclose(&fa, 2)
+        } else if standardErrorFd[0] != -1 && standardErrorFd[1] != -1 {
             posix_spawn_file_actions_addclose(&fa, standardErrorFd[0])
             posix_spawn_file_actions_adddup2(&fa, standardErrorFd[1], 2)
             posix_spawn_file_actions_addclose(&fa, standardErrorFd[1])
