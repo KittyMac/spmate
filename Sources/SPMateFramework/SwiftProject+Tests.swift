@@ -66,11 +66,18 @@ extension SwiftProject {
                         if let functionName = function.name,
                            functionName.hasPrefix("test"),
                            function.kind == .functionMethodInstance {
-                            testClass.tests.append(
-                                TestFunction(functionName: functionName,
-                                             filePath: classSyntax.file.path,
-                                             fileOffset: function.bodyoffset)
-                            )
+                            
+                            // functionName(argument:)
+                            // we only want the base name
+                            let regex = #"^([\d\w]+)\("#
+                            functionName.matches(regex) { (_, groups) in
+                                guard groups.count == 2 else { return }
+                                testClass.tests.append(
+                                    TestFunction(functionName: groups[1],
+                                                 filePath: classSyntax.file.path,
+                                                 fileOffset: function.bodyoffset)
+                                )
+                            }
                         }
                     }
                 }
@@ -100,7 +107,7 @@ extension SwiftProject {
         
         
         // 0. ensure the swift project is built for testing
-        let startBuilds = Date()
+        //let startBuilds = Date()
         var arguments: [String] = []
         arguments.append("build")
         arguments.append("--package-path")
@@ -112,12 +119,12 @@ extension SwiftProject {
         task.nullStandardError()
         task.run()
         task.wait()
-        print("Build done in \(abs(startBuilds.timeIntervalSinceNow))s")
+        // print("Build done in \(abs(startBuilds.timeIntervalSinceNow))s")
         
         // 1. then run all of the filters in parallel
         let allFilters = filters ?? [""]
         var allResults: [TestResult] = []
-        let startTests = Date()
+        //let startTests = Date()
         
         allFilters.syncOOB(timeout: 30 * 60) { filter, synchronized in
                     
@@ -179,7 +186,7 @@ extension SwiftProject {
             task.wait()
         }
         
-        print("All tests done in \(abs(startTests.timeIntervalSinceNow))s")
+        // print("All tests done in \(abs(startTests.timeIntervalSinceNow))s")
         
         returnCallback(allResults)
     }

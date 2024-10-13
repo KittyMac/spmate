@@ -14,7 +14,7 @@ final class SPMateTests: XCTestCase {
         let project = SwiftProject(path: projectPath())
         project.beTestsList(Flynn.any) { tests in
             XCTAssertEqual(tests.first?.className, "SPMateTests")
-            print(tests)
+            print(try! tests.json(pretty: true))
             expectation.fulfill()
         }
         wait(for: [expectation], timeout: 1.0)
