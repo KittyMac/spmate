@@ -60,7 +60,7 @@ extension SwiftProject {
     
     internal func _beTestsList(_ returnCallback: ([TestFunction]) -> ()) {
         
-        let allTestTargets = getPackageTestTargets()
+        //let allTestTargets = getPackageTestTargets()
         var allTests: [TestFunction] = []
 
         let testsASTBuilder = ASTBuilder()
@@ -83,18 +83,24 @@ extension SwiftProject {
                             functionName.matches(regex) { (_, groups) in
                                 guard groups.count == 2 else { return }
                                 
-                                // find the right target name for this source file
-                                for testTarget in allTestTargets {
-                                    if classSyntax.file.path!.hasPrefix(testTarget.targetPath) {
-                                        allTests.append(
-                                            TestFunction(targetName: testTarget.targetName,
-                                                         className: className,
-                                                         functionName: groups[1],
-                                                         filePath: classSyntax.file.path,
-                                                         fileOffset: function.bodyoffset)
-                                        )
+                                
+                                // Assume target name is the same as the directory under Tests/
+                                var targetName = className
+                                if let filePath = classSyntax.file.path {
+                                    var url = URL(fileURLWithPath: filePath)
+                                    while url.lastPathComponent != "Tests" {
+                                        targetName = url.lastPathComponent
+                                        url = url.deletingLastPathComponent()
                                     }
                                 }
+                                
+                                allTests.append(
+                                    TestFunction(targetName: targetName,
+                                                 className: className,
+                                                 functionName: groups[1],
+                                                 filePath: classSyntax.file.path,
+                                                 fileOffset: function.bodyoffset)
+                                )
                             }
                         }
                     }
