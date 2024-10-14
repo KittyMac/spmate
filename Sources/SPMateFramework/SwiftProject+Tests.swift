@@ -43,38 +43,79 @@ public class TestResult: Codable {
 
 extension SwiftProject {
     internal func _beTestsList(_ returnCallback: ([TestFunction]) -> ()) {
-        let astBuilder = ASTBuilder()
-        astBuilder.add(directory: safePath + "/Tests")
-                
-        let ast = astBuilder.build()
-        
-        // TODO: parse the Package.swift and only include tests from testing targets (also know the target name)
         
         // Find all classes which descend from XCTestCase
         var allTests: [TestFunction] = []
-        
-        for (className, classSyntax) in ast.classes {
-            if ast.isSubclassOf(classSyntax, "XCTestCase") {
-                                
-                // find all functions which start with test
-                if let functions = classSyntax.structure.substructure {
-                    for function in functions {
-                        if let functionName = function.name,
-                           functionName.hasPrefix("test"),
-                           function.kind == .functionMethodInstance {
+
+        // Parse the package.swift to know which test targets exist
+        let projectASTBuilder = ASTBuilder()
+        projectASTBuilder.add(file: safePath + "/Package.swift")
+        for targetSyntax in projectASTBuilder.packageTestTargets {
+            var targetName: String? = nil
+            var targetPath: String? = nil
+            
+            if let targetCalls = targetSyntax.structure.substructure {
+                for targetCall in targetCalls {
+                    if targetCall.name == "name",
+                       let bodyoffset = targetCall.bodyoffset, var bodylength = targetCall.bodylength {
+                        let nsrange = NSRange(location: Int(bodyoffset), length: Int(bodylength))
+                        let body = targetSyntax.file.contents
+                        if let value = body.substring(with: nsrange)?.trimmingCharacters(in: CharacterSet(charactersIn: "\"")) {
+                            targetName = value
+                        }
+                    }
+                    if targetCall.name == "path",
+                       let bodyoffset = targetCall.bodyoffset, var bodylength = targetCall.bodylength {
+                        let nsrange = NSRange(location: Int(bodyoffset), length: Int(bodylength))
+                        let body = targetSyntax.file.contents
+                        if let value = body.substring(with: nsrange)?.trimmingCharacters(in: CharacterSet(charactersIn: "\"")) {
+                            if value.hasPrefix("/") {
+                                targetPath = value
+                            } else {
+                                targetPath = safePath + "/" + value
+                            }
                             
-                            // functionName(argument:)
-                            // we only want the base name
-                            let regex = #"^([\d\w]+)\("#
-                            functionName.matches(regex) { (_, groups) in
-                                guard groups.count == 2 else { return }
-                                allTests.append(
-                                    TestFunction(targetName: "",
-                                                 className: className,
-                                                 functionName: groups[1],
-                                                 filePath: classSyntax.file.path,
-                                                 fileOffset: function.bodyoffset)
-                                )
+                        }
+                    }
+                }
+            }
+            
+            if let targetName = targetName,
+               targetPath == nil {
+                targetPath = safePath + "/Tests/" + targetName
+            }
+            
+            if let targetName = targetName,
+               let targetPath = targetPath {
+                
+                let testsASTBuilder = ASTBuilder()
+                testsASTBuilder.add(directory: targetPath)
+                let ast = testsASTBuilder.build()
+
+                for (className, classSyntax) in ast.classes {
+                    if ast.isSubclassOf(classSyntax, "XCTestCase") {
+                                        
+                        // find all functions which start with test
+                        if let functions = classSyntax.structure.substructure {
+                            for function in functions {
+                                if let functionName = function.name,
+                                   functionName.hasPrefix("test"),
+                                   function.kind == .functionMethodInstance {
+                                    
+                                    // functionName(argument:)
+                                    // we only want the base name
+                                    let regex = #"^([\d\w]+)\("#
+                                    functionName.matches(regex) { (_, groups) in
+                                        guard groups.count == 2 else { return }
+                                        allTests.append(
+                                            TestFunction(targetName: targetName,
+                                                         className: className,
+                                                         functionName: groups[1],
+                                                         filePath: classSyntax.file.path,
+                                                         fileOffset: function.bodyoffset)
+                                        )
+                                    }
+                                }
                             }
                         }
                     }

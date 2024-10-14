@@ -33,10 +33,26 @@ class ASTBuilder: Sequence {
     var calls: [FileSyntax] = []
     var functions: [FileSyntax] = []
     var files: [FileSyntax] = []
+    var packageTestTargets: [FileSyntax] = []
 
     func add(_ fileSyntax: FileSyntax) {
         files.append(fileSyntax)
         recursiveAdd([], fileSyntax, fileSyntax)
+    }
+    
+    func add(file filePath: String) {
+        if let file = File(path: filePath),
+           let syntax = try? StructureAndSyntax(file: file) {
+            
+            let fileSyntax = FileSyntax(outputPath: "/tmp",
+                                        file: file,
+                                        structure: syntax.structure,
+                                        ancestry: [],
+                                        tokens: syntax.syntax,
+                                        blacklist: [],
+                                        dependency: false)
+            self.add(fileSyntax)
+        }
     }
     
     func add(directory: String) {
@@ -80,6 +96,11 @@ class ASTBuilder: Sequence {
         
         if syntax.name != nil {
             switch syntax.kind {
+            case .exprCall:
+                if subSyntax.structure.name == ".testTarget" {
+                    packageTestTargets.append(subSyntax)
+                }
+                calls.append(subSyntax)
             case .class:
                 let fullName = AST.getFullName(fileSyntax, ancestory, subSyntax)
                 classes[fullName] = subSyntax.clone(ancestry: ancestory)
@@ -88,8 +109,6 @@ class ASTBuilder: Sequence {
                 protocols[fullName] = subSyntax.clone(ancestry: ancestory)
             case .extension, .extensionEnum, .extensionStruct:
                 extensions.append(subSyntax)
-            case .exprCall:
-                calls.append(subSyntax)
             case .functionAccessorAddress, .functionAccessorDidset, .functionAccessorGetter, .functionAccessorModify,
                  .functionAccessorMutableaddress, .functionAccessorRead, .functionAccessorSetter,
                  .functionAccessorWillset, .functionConstructor, .functionDestructor, .functionFree,
