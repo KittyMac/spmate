@@ -5,25 +5,22 @@ import Hitch
 import Studding
 
 public class TestFunction: Codable {
+    public var targetName: String
+    public var className: String
     public var functionName: String
     public var filePath: String?
     public var fileOffset: Int64?
     
-    init(functionName: String,
+    init(targetName: String,
+         className: String,
+         functionName: String,
          filePath: String?,
          fileOffset: Int64?) {
+        self.targetName = targetName
+        self.className = className
         self.functionName = functionName
         self.filePath = filePath
         self.fileOffset = fileOffset
-    }
-}
-
-public class TestClass: Codable {
-    public var className: String
-    public var tests: [TestFunction] = []
-    
-    init(className: String) {
-        self.className = className
     }
 }
 
@@ -45,21 +42,20 @@ public class TestResult: Codable {
 }
 
 extension SwiftProject {
-    internal func _beTestsList(_ returnCallback: ([TestClass]) -> ()) {
+    internal func _beTestsList(_ returnCallback: ([TestFunction]) -> ()) {
         let astBuilder = ASTBuilder()
         astBuilder.add(directory: safePath + "/Tests")
                 
         let ast = astBuilder.build()
         
+        // TODO: parse the Package.swift and only include tests from testing targets (also know the target name)
+        
         // Find all classes which descend from XCTestCase
-        var allTestClasses: [TestClass] = []
+        var allTests: [TestFunction] = []
         
         for (className, classSyntax) in ast.classes {
             if ast.isSubclassOf(classSyntax, "XCTestCase") {
-                
-                let testClass = TestClass(className: className)
-                allTestClasses.append(testClass)
-                
+                                
                 // find all functions which start with test
                 if let functions = classSyntax.structure.substructure {
                     for function in functions {
@@ -72,8 +68,10 @@ extension SwiftProject {
                             let regex = #"^([\d\w]+)\("#
                             functionName.matches(regex) { (_, groups) in
                                 guard groups.count == 2 else { return }
-                                testClass.tests.append(
-                                    TestFunction(functionName: groups[1],
+                                allTests.append(
+                                    TestFunction(targetName: "",
+                                                 className: className,
+                                                 functionName: groups[1],
                                                  filePath: classSyntax.file.path,
                                                  fileOffset: function.bodyoffset)
                                 )
@@ -84,7 +82,7 @@ extension SwiftProject {
             }
         }
         
-        returnCallback(allTestClasses)
+        returnCallback(allTests)
     }
     
     internal func _beTestsRun(filters: [String]?,
