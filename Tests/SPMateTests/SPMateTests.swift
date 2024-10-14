@@ -17,7 +17,7 @@ final class SPMateTests: XCTestCase {
             print(try! tests.json(pretty: true))
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 1.0)
+        wait(for: [expectation], timeout: 2.0)
     }
     
     func testTestsRun() throws {

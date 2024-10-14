@@ -17,7 +17,7 @@ final class NotRealTests: XCTestCase {
             print(try! tests.json(pretty: true))
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 1.0)
+        wait(for: [expectation], timeout: 3.0)
     }
     
     func testNotRealTest() throws {

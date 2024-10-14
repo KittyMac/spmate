@@ -40,7 +40,8 @@ let package = Package(
         ),
         .testTarget(
             name: "SPMateTests",
-            dependencies: [ "SPMate" ]
-        ),
+            dependencies: [ "SPMate" ],
+            path: "Tests/NotRealTests"
+        )
     ]
 )

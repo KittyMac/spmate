@@ -90,12 +90,12 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "test"
+            argument = "list"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "run"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--filter ExampleTestsA"
