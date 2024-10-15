@@ -60,21 +60,36 @@ extension SwiftProject {
         let path = pathFor(executable: "swift")
         let projectPath = safePath
         
-        
-        // 0. ensure the swift project is built for testing
-        //let startBuilds = Date()
-        var arguments: [String] = []
-        arguments.append("build")
-        arguments.append("--package-path")
-        arguments.append(safePath)
-        arguments.append("--build-tests")
-        let task = Spawn(path: path,
-                         arguments: arguments)
-        task.nullStandardOutput()
-        task.nullStandardError()
-        task.run()
-        task.wait()
-        // print("Build done in \(abs(startBuilds.timeIntervalSinceNow))s")
+        // Only one swift build command can run for the same project at the time same time, so
+        // we detect if any of ours are current running and we wait here till they end
+        let lockFilePath = projectPath + "/.spmate_lock"
+        if FileManager.default.fileExists(atPath: lockFilePath) == false {
+            
+            try? "".write(toFile: lockFilePath, atomically: false, encoding: .utf8)
+            
+            // 0. ensure the swift project is built for testing
+            //let startBuilds = Date()
+            var arguments: [String] = []
+            arguments.append("build")
+            arguments.append("--package-path")
+            arguments.append(safePath)
+            arguments.append("--build-tests")
+            let task = Spawn(path: path,
+                             arguments: arguments)
+            task.nullStandardOutput()
+            //task.nullStandardError()
+            task.run()
+            task.wait()
+            // print("Build done in \(abs(startBuilds.timeIntervalSinceNow))s")
+            
+            try? FileManager.default.removeItem(atPath: lockFilePath)
+        } else {
+            var sanity = 5 * 60
+            while FileManager.default.fileExists(atPath: lockFilePath) && sanity > 0 {
+                Flynn.sleep(1)
+                sanity -= 1
+            }
+        }
         
         // 1. then run all of the filters in parallel
         let allFilters = filters ?? [""]
