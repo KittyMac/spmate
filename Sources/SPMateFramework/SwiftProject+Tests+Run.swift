@@ -77,7 +77,7 @@ extension SwiftProject {
             let task = Spawn(path: path,
                              arguments: arguments)
             task.nullStandardOutput()
-            //task.nullStandardError()
+            task.nullStandardError()
             task.run()
             task.wait()
             // print("Build done in \(abs(startBuilds.timeIntervalSinceNow))s")
