@@ -4,6 +4,10 @@ import Foundation
 import Hitch
 import Studding
 
+private func fix(name: String) -> String {
+    return name.replacingOccurrences(of: "-", with: "_")
+}
+
 public class TestFunction: Codable {
     public var targetName: String
     public var className: String
@@ -42,6 +46,7 @@ public class TestResult: Codable {
 }
 
 extension SwiftProject {
+    
     internal func _beTestsRun(filters: [String]?,
                               _ returnCallback: @escaping ([TestResult]) -> ()) {
         
@@ -105,7 +110,7 @@ extension SwiftProject {
             arguments.append(projectPath)
             if filter.isEmpty == false {
                 arguments.append("--filter")
-                arguments.append(filter)
+                arguments.append(fix(name: filter))
             }
             let outPipe = SafePipe()!
             let task = Spawn(path: path,
