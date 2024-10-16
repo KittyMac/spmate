@@ -99,15 +99,15 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--filter EMLTests-AC"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "/Users/rjbowli/Development/textmate/test"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/Users/rjbowli/Development/smallplanet/smallplanet_RoverJS_SDK/eml_tests"
+            argument = "/Users/rjbowli/Development/textmate/test"
             isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/rjbowli/Development/smallplanet/smallplanet_RoverJS_SDK/eml_tests"
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--filter test_a,test_b,test_c"

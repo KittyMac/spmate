@@ -28,20 +28,40 @@ public class TestFunction: Codable {
     }
 }
 
+public class TestResultError: Codable {
+    public var filePath: String
+    public var fileLineNumber: Int
+    public var errorMessage: String
+    
+    init(filePath: String,
+         fileLineNumber: Int,
+         errorMessage: String) {
+        self.filePath = filePath
+        self.fileLineNumber = fileLineNumber
+        self.errorMessage = errorMessage
+    }
+}
+
 public class TestResult: Codable {
     public var targetName: String
     public var className: String
     public var functionName: String
     public var result: String
+    public var errors: [TestResultError]
     
     init(targetName: String,
          className: String,
          functionName: String,
-         result: String) {
+         result: String,
+         error: TestResultError?) {
         self.targetName = targetName
         self.className = className
         self.functionName = functionName
         self.result = result
+        self.errors = []
+        if let error = error {
+            self.errors.append(error)
+        }
     }
 }
 
@@ -130,15 +150,72 @@ extension SwiftProject {
             task.run()
             
             Thread {
+                
+                let recordResult: (String, String, String, String, TestResultError?) -> () = { targetName, className, functionName, result, error in
+                    
+                    for existingResult in allResults where existingResult.targetName == targetName && existingResult.className == className && existingResult.functionName == functionName {
+                        if let error = error {
+                            existingResult.errors.append(error)
+                        }
+                        existingResult.result = result
+                        return
+                    }
+                    
+                    allResults.append(
+                        TestResult(targetName: targetName,
+                                   className: className,
+                                   functionName: functionName,
+                                   result: result,
+                                   error: error)
+                    )
+                    
+                }
+                
                 while let result = outPipe.fileHandleForReading.read(upToCount: 1024 * 1024 * 32) {
                     let hitch = Hitch(data: result)
                     let lines: [HalfHitch] = hitch.components(separatedBy: "\n")
                     for line in lines {
                         // Test Case '-[testTests.ExampleTestsA testExample0]' passed (0.001 seconds).
                         // Test Case '-[testTests.ExampleTestsB testExample1]' failed (0.000 seconds).
-                        let regex = #"\[([\w\d]+)\.([\w\d]+)\s([\w\d]+)]\'\s+(\w+)"#
+                        
+                        // /Users/rjbowli/Development/textmate/test/Tests/testTests/ExampleTestsB.swift:7: error: -[testTests.ExampleTestsB testExample0] : XCTAssertEqual failed: ("true") is not equal to ("false")
+                        // /Users/rjbowli/Development/textmate/test/Tests/testTests/ExampleTestsB.swift:7: error: -[testTests.ExampleTestsB testExample0] : failed
+                        // /Users/rjbowli/Development/textmate/test/Tests/testTests/ExampleTestsB.swift:17: error: -[testTests.ExampleTestsB testExample2] : failed
+                        
+                        
+                        fputs(line.toString(), stderr)
+                        fputs("\n", stderr)
+                        
+                        
+                        
+                        if line.contains(": error:"),
+                           line.contains(" : "){
+                            let regex = #"^([^:]*):(\d+): error: -\[([\w\d]+)\.([\w\d]+)\s([\w\d]+)] : (.+)"#
+                            
+                            line.toTempString().matches(regex) { (_, groups) in
+                                guard groups.count == 7 else { return }
+                                
+                                let filePath = groups[1]
+                                let fileLineNumber = Int(groups[2]) ?? 0
+                                
+                                let targetName = groups[3]
+                                let className = groups[4]
+                                let functionName = groups[5]
+                                let errorMessage = groups[6]
+                                
+                                let testResultError = TestResultError(filePath: filePath,
+                                                                      fileLineNumber: fileLineNumber,
+                                                                      errorMessage: errorMessage)
+                                
+                                synchronized {
+                                    recordResult(targetName, className, functionName, "failed", testResultError)
+                                }
+                            }
+                        }
                         
                         if line.starts(with: "Test Case ") {
+                            let regex = #"\[([\w\d]+)\.([\w\d]+)\s([\w\d]+)]\'\s+(\w+)"#
+                            
                             line.toTempString().matches(regex) { (_, groups) in
                                 guard groups.count == 5 else { return }
                                 
@@ -149,12 +226,7 @@ extension SwiftProject {
                                 
                                 if result == "passed" || result == "failed" {
                                     synchronized {
-                                        allResults.append(
-                                            TestResult(targetName: targetName,
-                                                       className: className,
-                                                       functionName: functionName,
-                                                       result: result)
-                                        )
+                                        recordResult(targetName, className, functionName, result, nil)
                                     }
                                 }
                             }
