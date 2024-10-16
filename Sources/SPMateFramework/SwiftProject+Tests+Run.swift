@@ -68,7 +68,10 @@ extension SwiftProject {
         // Only one swift build command can run for the same project at the time same time, so
         // we detect if any of ours are current running and we wait here till they end
         let lockFilePath = projectPath + "/.spmate_lock"
-        if FileManager.default.fileExists(atPath: lockFilePath) == false {
+        
+        guard let file = fopen(lockFilePath, "a") else { fatalError() }
+        let fd = fileno(file)
+        if flock(fd, LOCK_EX) == 0 {
             
             try? "".write(toFile: lockFilePath, atomically: false, encoding: .utf8)
             
@@ -87,13 +90,15 @@ extension SwiftProject {
             task.wait()
             // print("Build done in \(abs(startBuilds.timeIntervalSinceNow))s")
             
-            try? FileManager.default.removeItem(atPath: lockFilePath)
+            flock(fd, LOCK_UN)
+            fclose(file)
         } else {
             var sanity = 5 * 60
-            while FileManager.default.fileExists(atPath: lockFilePath) && sanity > 0 {
+            while flock(fd, LOCK_EX) != 0 && sanity > 0 {
                 Flynn.sleep(1)
                 sanity -= 1
             }
+            flock(fd, LOCK_UN)
         }
         
         // 1. then run all of the filters in parallel

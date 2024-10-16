@@ -98,7 +98,7 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--filter ReceiptsTests_aaa0/test_aaa00"
+            argument = "--filter EMLTests-AC"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
